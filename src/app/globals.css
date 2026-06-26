@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Design System — Family Budget AI Pro
+ * Tokens HSL para Light/Dark Mode. Estética Apple: neutros quentes,
+ * azul de sistema, verde poupança. Cantos arredondados e sombras suaves.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+@layer base {
+  :root {
+    /* Tipografia — SF Pro Display com fallbacks nativos.
+       Definido aqui para que var(--font-sf) resolva sempre. */
+    --font-sf: "SF Pro Display", "SF Pro Text", "SF Pro Icons";
+
+    /* Superfícies — muito espaço branco, neutros suaves */
+    --background: 210 40% 99%;
+    --foreground: 222 24% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 24% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 24% 12%;
+
+    /* Azul de sistema Apple (#0A84FF aprox.) */
+    --primary: 211 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 24% 16%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 24% 16%;
+
+    /* Vermelho de sistema Apple */
+    --destructive: 4 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 91%;
+    --input: 214 20% 91%;
+    --ring: 211 100% 50%;
+
+    /* Cores semânticas */
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --info: 199 89% 48%;
+
+    --radius: 1rem;
+  }
+
+  .dark {
+    /* Fundo escuro estilo iOS — quase preto, ligeiramente azulado */
+    --background: 222 24% 7%;
+    --foreground: 210 20% 96%;
+
+    --card: 222 22% 11%;
+    --card-foreground: 210 20% 96%;
+
+    --popover: 222 22% 11%;
+    --popover-foreground: 210 20% 96%;
+
+    --primary: 211 100% 56%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 19% 18%;
+    --secondary-foreground: 210 20% 96%;
+
+    --muted: 217 19% 16%;
+    --muted-foreground: 215 14% 65%;
+
+    --accent: 217 19% 18%;
+    --accent-foreground: 210 20% 96%;
+
+    --destructive: 4 80% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 19% 20%;
+    --input: 217 19% 22%;
+    --ring: 211 100% 56%;
+
+    --success: 142 64% 48%;
+    --warning: 38 92% 55%;
+    --info: 199 89% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tipografia com tracking apertado, característica do SF Pro Display */
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-sans font-semibold tracking-tight;
+  }
+
+  /* Scrollbar discreta */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-muted-foreground/20;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+@layer components {
+  /*
+   * Glassmorphism subtil — usado em cards de destaque, navbar e modais.
+   * Combina blur de fundo com transparência e borda luminosa.
+   */
+  .glass {
+    @apply border border-white/40 bg-white/70 backdrop-blur-xl;
+  }
+  .dark .glass {
+    @apply border-white/10 bg-white/[0.06];
+  }
+
+  .glass-strong {
+    @apply border border-white/50 bg-white/85 backdrop-blur-2xl;
+  }
+  .dark .glass-strong {
+    @apply border-white/10 bg-white/[0.08];
+  }
+
+  /* Cartão estilo Apple Wallet — gradiente subtil e sombra em camadas */
+  .wallet-card {
+    @apply relative overflow-hidden rounded-3xl shadow-soft-lg;
+  }
+
+  /* Efeito de brilho que percorre o skeleton de carregamento */
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+  .shimmer::after {
+    @apply absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent;
+    content: "";
+  }
+}
+
+@layer utilities {
+  /* Números tabulares para alinhar valores monetários */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Impressão de relatórios — esconde tudo exceto a área #print-area */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #print-area,
+    #print-area * {
+      visibility: visible;
+    }
+    #print-area {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      padding: 0;
+    }
+    .no-print {
+      display: none !important;
+    }
+  }
+
+  /* Texto com gradiente (títulos de destaque) */
+  .text-gradient {
+    @apply bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent;
+  }
+}
