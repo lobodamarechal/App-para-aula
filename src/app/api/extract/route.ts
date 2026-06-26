@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoExtracted } from "@/lib/demo";
 import {
   extractTransactionsFromPDF,
   extractTransactionsFromText,
@@ -17,6 +18,12 @@ export const maxDuration = 120;
  * Extrai transações do extrato com Claude e guarda-as na base de dados.
  */
 export async function POST(request: Request) {
+  // Modo demonstração: devolve transações de exemplo (sem chamar a IA/BD).
+  if (DEMO_MODE) {
+    const transactions = demoExtracted();
+    return NextResponse.json({ inserted: transactions.length, transactions });
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

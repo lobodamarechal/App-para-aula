@@ -3,6 +3,7 @@ import { FileText, CalendarDays, ArrowRight } from "lucide-react";
 
 import { getProfile } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoReports } from "@/lib/demo";
 import { formatDate } from "@/lib/utils";
 import type { Report } from "@/lib/types";
 
@@ -26,12 +27,17 @@ export default async function ReportsPage() {
   const profile = await getProfile();
   const isPremium = profile?.is_premium ?? false;
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("reports")
-    .select("*")
-    .order("created_at", { ascending: false });
-  const reports = (data as Report[]) ?? [];
+  let reports: Report[];
+  if (DEMO_MODE) {
+    reports = demoReports();
+  } else {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("reports")
+      .select("*")
+      .order("created_at", { ascending: false });
+    reports = (data as Report[]) ?? [];
+  }
 
   return (
     <div className="space-y-6">

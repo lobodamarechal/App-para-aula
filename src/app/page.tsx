@@ -15,6 +15,7 @@ import { Brand } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Reveal } from "@/components/marketing/reveal";
+import { DemoBanner } from "@/components/demo-banner";
 
 const FEATURES = [
   {
@@ -116,6 +117,10 @@ export default function LandingPage() {
             Os teus dados são privados e protegidos com encriptação ao nível da linha.
           </p>
         </Reveal>
+
+        <div className="w-full max-w-md">
+          <DemoBanner />
+        </div>
       </section>
 
       {/* Features */}

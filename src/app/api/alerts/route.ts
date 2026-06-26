@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoAlerts } from "@/lib/demo";
 import { loadContext, runJson } from "@/lib/claude/analyze";
 import { alertsSystem } from "@/lib/claude/prompts";
 import type { AlertSeverity, AlertType } from "@/lib/types";
@@ -53,6 +54,10 @@ const schema = {
 
 /** POST /api/alerts — analisa os dados e gera alertas inteligentes. */
 export async function POST() {
+  if (DEMO_MODE) {
+    return NextResponse.json({ inserted: demoAlerts.length, alerts: demoAlerts });
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,5 +1,6 @@
 import { getProfile, getUser } from "@/lib/data";
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE } from "@/lib/demo";
 import type { FamilyMember } from "@/lib/types";
 
 import { PageHeader } from "@/components/dashboard/page-header";
@@ -13,13 +14,16 @@ export default async function FamilyPage() {
   const [profile, user] = await Promise.all([getProfile(), getUser()]);
   const isPremium = profile?.is_premium ?? false;
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("family_members")
-    .select("*")
-    .eq("owner_id", user?.id ?? "")
-    .order("created_at", { ascending: false });
-  const members = (data as FamilyMember[]) ?? [];
+  let members: FamilyMember[] = [];
+  if (!DEMO_MODE) {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("family_members")
+      .select("*")
+      .eq("owner_id", user?.id ?? "")
+      .order("created_at", { ascending: false });
+    members = (data as FamilyMember[]) ?? [];
+  }
 
   return (
     <div className="space-y-6">

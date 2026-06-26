@@ -1,6 +1,17 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import {
+  DEMO_MODE,
+  demoProfile,
+  demoTransactions,
+  demoBudgets,
+  demoGoals,
+  demoAlerts,
+  demoSubscriptions,
+  demoInsights,
+  demoScore,
+} from "@/lib/demo";
 import type {
   Transaction,
   Budget,
@@ -14,6 +25,7 @@ import type {
 
 /** Devolve o utilizador autenticado ou null. */
 export async function getUser() {
+  if (DEMO_MODE) return { id: demoProfile.id, email: demoProfile.email } as const;
   const supabase = await createClient();
   const {
     data: { user },
@@ -23,6 +35,7 @@ export async function getUser() {
 
 /** Carrega o perfil do utilizador atual. */
 export async function getProfile(): Promise<Profile | null> {
+  if (DEMO_MODE) return demoProfile;
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,6 +51,10 @@ export async function getProfile(): Promise<Profile | null> {
 
 /** Todas as transações do utilizador (ordenadas por data desc). */
 export async function getTransactions(limit?: number): Promise<Transaction[]> {
+  if (DEMO_MODE) {
+    const txs = demoTransactions();
+    return limit ? txs.slice(0, limit) : txs;
+  }
   const supabase = await createClient();
   let query = supabase
     .from("transactions")
@@ -50,6 +67,7 @@ export async function getTransactions(limit?: number): Promise<Transaction[]> {
 
 /** Orçamentos do utilizador. */
 export async function getBudgets(): Promise<Budget[]> {
+  if (DEMO_MODE) return demoBudgets;
   const supabase = await createClient();
   const { data } = await supabase.from("budgets").select("*");
   return (data as Budget[]) ?? [];
@@ -57,6 +75,7 @@ export async function getBudgets(): Promise<Budget[]> {
 
 /** Metas financeiras. */
 export async function getGoals(): Promise<Goal[]> {
+  if (DEMO_MODE) return demoGoals;
   const supabase = await createClient();
   const { data } = await supabase
     .from("goals")
@@ -67,6 +86,7 @@ export async function getGoals(): Promise<Goal[]> {
 
 /** Alertas (mais recentes primeiro). */
 export async function getAlerts(): Promise<Alert[]> {
+  if (DEMO_MODE) return demoAlerts;
   const supabase = await createClient();
   const { data } = await supabase
     .from("alerts")
@@ -78,6 +98,7 @@ export async function getAlerts(): Promise<Alert[]> {
 
 /** Assinaturas detetadas. */
 export async function getSubscriptions(): Promise<Subscription[]> {
+  if (DEMO_MODE) return demoSubscriptions;
   const supabase = await createClient();
   const { data } = await supabase
     .from("subscriptions")
@@ -88,6 +109,7 @@ export async function getSubscriptions(): Promise<Subscription[]> {
 
 /** Insights IA (semanais, previsões, literacia). */
 export async function getInsights(type?: string): Promise<AiInsight[]> {
+  if (DEMO_MODE) return demoInsights(type);
   const supabase = await createClient();
   let query = supabase
     .from("ai_insights")
@@ -101,6 +123,7 @@ export async function getInsights(type?: string): Promise<AiInsight[]> {
 
 /** Último score financeiro registado. */
 export async function getLatestScore(): Promise<FinancialScore | null> {
+  if (DEMO_MODE) return demoScore;
   const supabase = await createClient();
   const { data } = await supabase
     .from("financial_scores")

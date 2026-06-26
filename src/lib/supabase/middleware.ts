@@ -1,11 +1,16 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { DEMO_MODE } from "@/lib/demo";
+
 /**
  * Renova a sessão Supabase a cada pedido e protege as rotas privadas.
  * Chamado a partir de `middleware.ts` na raiz do projeto.
  */
 export async function updateSession(request: NextRequest) {
+  // Em modo demonstração não há sessão a renovar nem rotas a proteger.
+  if (DEMO_MODE) return NextResponse.next({ request });
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

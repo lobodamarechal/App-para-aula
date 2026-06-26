@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoScore } from "@/lib/demo";
 import { loadContext, runJson } from "@/lib/claude/analyze";
 import { scoreSystem } from "@/lib/claude/prompts";
 
@@ -38,6 +39,8 @@ const schema = {
 
 /** POST /api/score — calcula e guarda o Score Financeiro (0-100). */
 export async function POST() {
+  if (DEMO_MODE) return NextResponse.json({ score: demoScore });
+
   const supabase = await createClient();
   const {
     data: { user },

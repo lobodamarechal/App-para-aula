@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoInsights } from "@/lib/demo";
 import { loadContext, runJson } from "@/lib/claude/analyze";
 import { forecastSystem } from "@/lib/claude/prompts";
 
@@ -29,6 +30,10 @@ const schema = {
 
 /** POST /api/forecast — estima o saldo futuro do utilizador. */
 export async function POST() {
+  if (DEMO_MODE) {
+    return NextResponse.json({ forecast: demoInsights("forecast")[0].data });
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoLiteracy } from "@/lib/demo";
 import { runText } from "@/lib/claude/analyze";
 
 export const maxDuration = 60;
@@ -14,6 +15,15 @@ const TOPICS: Record<string, string> = {
 
 /** POST /api/literacy — gera conteúdo educativo sobre um tema financeiro. */
 export async function POST(request: Request) {
+  const { topic } = (await request.json().catch(() => ({}))) as {
+    topic?: string;
+  };
+
+  // Modo demonstração: conteúdo educativo simulado.
+  if (DEMO_MODE) {
+    return NextResponse.json({ insight: demoLiteracy(topic) });
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,9 +32,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
   }
 
-  const { topic } = (await request.json().catch(() => ({}))) as {
-    topic?: string;
-  };
   const subject = TOPICS[topic ?? ""] ?? TOPICS.poupanca;
 
   try {

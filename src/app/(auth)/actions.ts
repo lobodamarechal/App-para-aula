@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE } from "@/lib/demo";
 
 export interface AuthState {
   error?: string;
@@ -16,6 +17,9 @@ export async function login(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  // Demo: entra diretamente, sem validar credenciais.
+  if (DEMO_MODE) redirect("/dashboard");
+
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
 
@@ -39,6 +43,9 @@ export async function register(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  // Demo: cria "conta" e entra diretamente.
+  if (DEMO_MODE) redirect("/dashboard");
+
   const fullName = String(formData.get("full_name") || "").trim();
   const email = String(formData.get("email") || "").trim();
   const password = String(formData.get("password") || "");
@@ -83,6 +90,9 @@ export async function forgotPassword(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (DEMO_MODE)
+    return { success: "Modo demonstração — recuperação de password indisponível." };
+
   const email = String(formData.get("email") || "").trim();
   if (!email) return { error: "Indica o teu email." };
 
@@ -105,6 +115,8 @@ export async function updatePassword(
   _prev: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  if (DEMO_MODE) redirect("/dashboard");
+
   const password = String(formData.get("password") || "");
   if (password.length < 8) {
     return { error: "A password deve ter pelo menos 8 caracteres." };
@@ -120,6 +132,7 @@ export async function updatePassword(
 
 /** Termina a sessão. */
 export async function logout() {
+  if (DEMO_MODE) redirect("/");
   const supabase = await createClient();
   await supabase.auth.signOut();
   revalidatePath("/", "layout");

@@ -3,8 +3,15 @@
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE } from "@/lib/demo";
 import { INCOME_CATEGORIES } from "@/lib/constants";
 import type { CategoryName } from "@/lib/constants";
+
+/** Mensagem padrão devolvida quando se tenta escrever em modo demonstração. */
+const DEMO_BLOCK = {
+  error:
+    "Modo demonstração — configura o Supabase para guardar alterações reais.",
+} as const;
 
 async function requireUser() {
   const supabase = await createClient();
@@ -18,6 +25,7 @@ async function requireUser() {
 // ── Transações ──────────────────────────────────────────────────────────────
 
 export async function addTransaction(formData: FormData) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
 
   const category = String(formData.get("category_name") || "Outros");
@@ -43,6 +51,7 @@ export async function addTransaction(formData: FormData) {
 }
 
 export async function deleteTransaction(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   const { error } = await supabase.from("transactions").delete().eq("id", id);
   if (error) return { error: error.message };
@@ -54,6 +63,7 @@ export async function deleteTransaction(id: string) {
 // ── Orçamentos ──────────────────────────────────────────────────────────────
 
 export async function upsertBudget(categoryName: string, amount: number) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
   const now = new Date();
 
@@ -76,6 +86,7 @@ export async function upsertBudget(categoryName: string, amount: number) {
 }
 
 export async function deleteBudget(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   const { error } = await supabase.from("budgets").delete().eq("id", id);
   if (error) return { error: error.message };
@@ -86,6 +97,7 @@ export async function deleteBudget(id: string) {
 // ── Metas ───────────────────────────────────────────────────────────────────
 
 export async function addGoal(formData: FormData) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
   const { error } = await supabase.from("goals").insert({
     user_id: user.id,
@@ -106,6 +118,7 @@ export async function addGoal(formData: FormData) {
 }
 
 export async function updateGoalAmount(id: string, currentAmount: number) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   const { error } = await supabase
     .from("goals")
@@ -118,6 +131,7 @@ export async function updateGoalAmount(id: string, currentAmount: number) {
 }
 
 export async function deleteGoal(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   const { error } = await supabase.from("goals").delete().eq("id", id);
   if (error) return { error: error.message };
@@ -128,6 +142,7 @@ export async function deleteGoal(id: string) {
 // ── Alertas ─────────────────────────────────────────────────────────────────
 
 export async function markAlertRead(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   await supabase.from("alerts").update({ is_read: true }).eq("id", id);
   revalidatePath("/alerts");
@@ -135,6 +150,7 @@ export async function markAlertRead(id: string) {
 }
 
 export async function deleteAlert(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   await supabase.from("alerts").delete().eq("id", id);
   revalidatePath("/alerts");
@@ -144,6 +160,7 @@ export async function deleteAlert(id: string) {
 // ── Perfil / Definições ──────────────────────────────────────────────────────
 
 export async function updateProfile(formData: FormData) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
   const { error } = await supabase
     .from("profiles")
@@ -159,6 +176,7 @@ export async function updateProfile(formData: FormData) {
 
 /** Ativa/desativa o modo Premium (demonstração — sem pagamento real). */
 export async function togglePremium(enabled: boolean) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
   const { error } = await supabase
     .from("profiles")
@@ -172,6 +190,7 @@ export async function togglePremium(enabled: boolean) {
 // ── Modo Família ──────────────────────────────────────────────────────────────
 
 export async function inviteFamilyMember(formData: FormData) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase, user } = await requireUser();
   const email = String(formData.get("member_email") || "").trim();
   if (!email) return { error: "Indica o email do membro." };
@@ -195,6 +214,7 @@ export async function inviteFamilyMember(formData: FormData) {
 }
 
 export async function removeFamilyMember(id: string) {
+  if (DEMO_MODE) return DEMO_BLOCK;
   const { supabase } = await requireUser();
   await supabase.from("family_members").delete().eq("id", id);
   revalidatePath("/family");

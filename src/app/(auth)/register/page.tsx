@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { AuthMessage } from "@/components/auth/auth-message";
+import { DemoBanner } from "@/components/demo-banner";
 
 const initial: AuthState = {};
 
@@ -22,6 +23,8 @@ export default function RegisterPage() {
           Começa a controlar as finanças da tua família em segundos.
         </p>
       </div>
+
+      <DemoBanner />
 
       <form action={formAction} className="space-y-4">
         <AuthMessage error={state.error} success={state.success} />

@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoProfile } from "@/lib/demo";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Topbar } from "@/components/dashboard/topbar";
 import type { Profile } from "@/lib/types";
@@ -14,6 +15,23 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Modo demonstração: usa o perfil de exemplo, sem backend.
+  if (DEMO_MODE) {
+    return (
+      <div className="flex min-h-screen bg-background">
+        <Sidebar className="hidden lg:flex" isPremium={demoProfile.is_premium} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Topbar profile={demoProfile} />
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-6xl animate-fade-in">
+              {children}
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

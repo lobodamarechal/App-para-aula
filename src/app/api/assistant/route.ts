@@ -3,9 +3,32 @@ import { getClaude } from "@/lib/claude/client";
 import { assistantSystem } from "@/lib/claude/prompts";
 import { buildFinancialContext } from "@/lib/finance";
 import { CLAUDE_MODEL } from "@/lib/constants";
+import { DEMO_MODE, demoAssistantReply } from "@/lib/demo";
 import type { Transaction, Budget, ChatMessage } from "@/lib/types";
 
 export const maxDuration = 60;
+
+/** Stream de texto simples a partir de uma string (usado no modo demo). */
+function textStream(text: string): Response {
+  const encoder = new TextEncoder();
+  const words = text.split(/(\s+)/); // mantém espaços para efeito de escrita
+  const stream = new ReadableStream({
+    async start(controller) {
+      for (const w of words) {
+        controller.enqueue(encoder.encode(w));
+        // Pequena pausa para simular streaming.
+        await new Promise((r) => setTimeout(r, 12));
+      }
+      controller.close();
+    },
+  });
+  return new Response(stream, {
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "no-cache, no-transform",
+    },
+  });
+}
 
 /**
  * POST /api/assistant
@@ -13,18 +36,6 @@ export const maxDuration = 60;
  * Responde via streaming usando os dados financeiros reais do utilizador.
  */
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return new Response(JSON.stringify({ error: "Não autenticado." }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
-  }
-
   let body: { messages: ChatMessage[] };
   try {
     body = await request.json();
@@ -37,6 +48,23 @@ export async function POST(request: Request) {
   );
   if (messages.length === 0) {
     return new Response("Sem mensagens.", { status: 400 });
+  }
+
+  // Modo demonstração: resposta simulada (sem chamar a Claude nem a BD).
+  if (DEMO_MODE) {
+    return textStream(demoAssistantReply(messages));
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return new Response(JSON.stringify({ error: "Não autenticado." }), {
+      status: 401,
+      headers: { "content-type": "application/json" },
+    });
   }
 
   // Constrói o contexto financeiro a partir dos dados do utilizador.

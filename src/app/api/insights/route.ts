@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoInsights } from "@/lib/demo";
 import { loadContext, runText } from "@/lib/claude/analyze";
 import { weeklyInsightSystem } from "@/lib/claude/prompts";
 
@@ -8,6 +9,8 @@ export const maxDuration = 60;
 
 /** POST /api/insights — gera um insight semanal e guarda-o. */
 export async function POST() {
+  if (DEMO_MODE) return NextResponse.json({ insight: demoInsights("weekly")[0] });
+
   const supabase = await createClient();
   const {
     data: { user },

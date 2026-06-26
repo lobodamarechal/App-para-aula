@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { DEMO_MODE, demoReports } from "@/lib/demo";
 import { runText } from "@/lib/claude/analyze";
 import {
   computeMetrics,
@@ -18,6 +19,8 @@ type ReportType = "monthly" | "quarterly" | "annual";
 
 /** POST /api/reports — gera um relatório (mensal/trimestral/anual) com análise IA. */
 export async function POST(request: Request) {
+  if (DEMO_MODE) return NextResponse.json({ report: demoReports()[0] });
+
   const supabase = await createClient();
   const {
     data: { user },

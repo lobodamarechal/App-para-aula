@@ -11,6 +11,34 @@ iCloud).
 
 ---
 
+## 🟢 Modo demonstração (sem configuração)
+
+A app tem um **modo demonstração** que liga **automaticamente** quando não há
+variáveis de ambiente Supabase definidas. Nesse modo:
+
+- Login simulado (entra com um toque, sem criar conta).
+- Dados financeiros de exemplo já carregados (6 meses de transações, orçamentos,
+  metas, alertas, assinaturas, score e previsão).
+- Funcionalidades de IA simuladas (não chama a API Claude).
+- Todas as páginas Premium desbloqueadas para explorar.
+
+Assim que configurares `NEXT_PUBLIC_SUPABASE_URL` (+ chave Anthropic), a app
+passa **automaticamente** a usar dados reais.
+
+### Deploy 1-clique (testar no telemóvel)
+
+Como o modo demo não precisa de backend, podes publicá-lo sem variáveis de
+ambiente — ideal para abrir no telemóvel:
+
+1. Abre o browser (telemóvel ou PC) em **https://vercel.com/new** e inicia sessão com o GitHub.
+2. **Import** do repositório `lobodamarechal/App-para-aula` (branch `claude/loving-darwin-35bltn`).
+3. **Não definas variáveis de ambiente** → **Deploy**.
+4. Em ~1-2 min recebes um URL público (`https://...vercel.app`) que abre em qualquer telemóvel — entra com o botão **“Entrar na demo”**.
+
+Para a versão real e funcional, adiciona depois as variáveis (ver “Começar” abaixo) e faz *Redeploy*.
+
+---
+
 ## ✨ Funcionalidades
 
 ### Núcleo
